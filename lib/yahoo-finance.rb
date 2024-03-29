@@ -171,7 +171,7 @@ module YahooFinance
         params[:period1] = current_date
         current_end_date = [current_date + time_from_days(days_per_page), end_date.to_time.to_i].min
         params[:period2] = current_end_date
-        url = "https://finance.yahoo.com/quote/#{URI.escape(symbol)}/history/?#{params.map{|k, v| "#{k}=#{v}"}.join("&")}"
+        url = "https://finance.yahoo.com/quote/#{URI.encode_www_form_component(symbol)}/history/?#{params.map{|k, v| "#{k}=#{v}"}.join("&")}"
         data << read_historical(symbol, url)
         current_date = current_end_date + time_from_days(1)
       end
@@ -212,7 +212,7 @@ module YahooFinance
 
     def read_quotes(symb_str, cols)
       columns = "#{cols.map { |col| COLUMNS[col][0] }.join("")}"
-      conn = open("https://download.finance.yahoo.com/d/quotes.csv?s=#{URI.escape(symb_str)}&f=#{columns}")
+      conn = open("https://download.finance.yahoo.com/d/quotes.csv?s=#{URI.encode_www_form_component(symb_str)}&f=#{columns}")
       CSV.parse(conn.read, headers: cols)
     end
 
@@ -249,7 +249,7 @@ module YahooFinance
     end
 
     def read_splits(symbol, options)
-      params = { s: URI.escape(symbol), g: "v" }
+      params = { s: URI.encode_www_form_component(symbol), g: "v" }
       if options[:start_date]
         params[:a] = options[:start_date].month-1
         params[:b] = options[:start_date].day
